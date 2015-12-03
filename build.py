@@ -71,7 +71,7 @@ def initialize(project):
 
     project.install_file('/var/www', 'livestatus_service/livestatus_service.wsgi')
     project.install_file('/etc/httpd/conf.d/', 'livestatus_service/livestatus_service.conf')
-    project.install_file('/etc', 'livestatus.cfg')
+    project.install_file('/etc', 'livestatus_service/livestatus.cfg')
 
     project.include_file("livestatus_service", "templates/*.html")
     project.set_property("coverage_threshold_warn", 99)
