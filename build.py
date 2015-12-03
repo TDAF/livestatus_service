@@ -60,6 +60,7 @@ def initialize(project):
 
     project.set_property('copy_resources_target', '$dir_dist')
     project.get_property('copy_resources_glob').append('setup.cfg')
+    project.get_property('copy_resources_glob').append('livestatus.cfg')
     project.get_property('copy_resources_glob').append('README')
 
     project.set_property('flake8_include_test_sources', True)
