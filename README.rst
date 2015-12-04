@@ -60,14 +60,12 @@ One-step checkout, test, build
 
 ::
 
-    sudo pip install pyb-init && pyb-init github ImmobilienScout24 : livestatus_service
+    sudo pip install pyb-init && pyb-init github TDAF : livestatus_service
 
 Afterwards, building and packaging can be done with
 
 ::
 
-    source venv/bin/activate
-    pyb
     cd target/dist/livestatus-service-$VERSION
     python setup.py bdist_rpm
 
