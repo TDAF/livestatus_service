@@ -54,11 +54,13 @@ def handle_index():
 
 @application.route('/query', methods=['GET'])
 def handle_query():
+    LOGGER.debug("Processing query...")
     return validate_and_dispatch(request, perform_query)
 
 
 @application.route('/cmd', methods=['GET', 'POST'])
 def handle_command():
+    LOGGER.debug("Processing command...")
     return validate_and_dispatch(request, perform_command)
 
 
@@ -81,8 +83,9 @@ def validate_and_dispatch(request, dispatch_function):
         query = request.args.get('q') or request.form.get('q')
         query = validate_query(query)
         key = request.args.get('key')
+        auth = request.authorization.username if request.authorization else None
         handler = request.args.get('handler') or request.form.get('handler')
-        return dispatch_request(query, dispatch_function, key=key, handler=handler)
+        return dispatch_request(query, dispatch_function, key=key, auth=auth, handler=handler)
     except BaseException as exception:
         LOGGER.error(traceback.format_exc())
         return 'Error : %s' % exception, 200

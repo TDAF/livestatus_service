@@ -45,10 +45,12 @@ class Configuration(object):
     DEFAULT_LOG_FILE = '/var/log/livestatus-service.log'
     DEFAULT_LIVESTATUS_SOCKET = '/var/lib/nagios/rw/live'
     DEFAULT_ICINGA_COMMAND_FILE = '/usr/local/icinga/var/rw/icinga.cmd'
+    DEFAULT_ADMINS = []
 
     OPTION_LOG_FILE = 'log_file'
     OPTION_LIVESTATUS_SOCKET = 'livestatus_socket'
     OPTION_ICINGA_COMMAND_FILE = 'icinga_command_file'
+    OPTION_ADMINS = 'admins'
 
     SECTION = 'livestatus-service'
 
@@ -68,6 +70,15 @@ class Configuration(object):
     @property
     def icinga_command_file(self):
         return self._get_option(Configuration.OPTION_ICINGA_COMMAND_FILE, Configuration.DEFAULT_ICINGA_COMMAND_FILE)
+
+    @property
+    def icinga_command_file(self):
+        return self._get_option(Configuration.OPTION_ICINGA_COMMAND_FILE, Configuration.DEFAULT_ICINGA_COMMAND_FILE)
+
+    @property
+    def admins(self):
+        admins_csv = self._get_option(Configuration.OPTION_ADMINS, Configuration.DEFAULT_ADMINS)
+        return admins_csv.split(',')
 
     def _get_option(self, option, default_value=None):
         if not self._config_parser.has_option(Configuration.SECTION, option):
