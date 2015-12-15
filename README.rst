@@ -140,3 +140,21 @@ on your server. The file should consist of access restrictions, e.G.
     </Location>
 
 If the file is not present then there will be no authentication.
+
+
+Example to deploy livestatus_service in a suburi. Python deps installed in /opt/icinga-api/python2.6/site-packages
+
+::
+
+     WSGIDaemonProcess livestatus_service user=icinga group=icinga threads=5 processes=2 python-path=/opt/icinga-api/python2.6/site-packages
+     WSGIScriptAlias /api /etc/apache/livestatus_service.wsgi
+     WSGISocketPrefix /etc/apache
+     WSGIProcessGroup livestatus_service
+     WSGIPassAuthorization On
+     
+     <Location /api>
+       AuthName "Icinga API"
+       AuthType Basic
+       AuthUserFile /etc/apache/passwd
+       Require valid-user
+     </Location>
