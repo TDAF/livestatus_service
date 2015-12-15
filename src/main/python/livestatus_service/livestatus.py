@@ -69,10 +69,16 @@ class LivestatusSocket(object):
         self._socket.shutdown(socket.SHUT_WR)
         self._socket.close()
 
-    def send_query_and_receive_json_answer(self, query):
+    def send_query_and_receive_json_answer(self, query, auth=None):
         self.connect_if_necessary()
-        self._socket.send("{0}\nOutputFormat: json\n"
-                          .format(query).encode('utf-8'))
+
+        if auth:
+            self._socket.send("{0}\nOutputFormat: json\nAuthUser: {1}\n"
+                              .format(query, auth).encode('utf-8'))
+        else:
+            self._socket.send("{0}\nOutputFormat: json\n"
+                              .format(query).encode('utf-8'))
+
         self._socket.shutdown(socket.SHUT_WR)
         answer = self.receive_json_answer()
         self._socket.close()
@@ -91,15 +97,17 @@ class LivestatusSocket(object):
         return answer
 
 
-def perform_query(query, socket_path, key=None):
+def perform_query(query, socket_path, key=None, auth=None):
     livestatus_socket = LivestatusSocket(socket_path)
-    answer = livestatus_socket.send_query_and_receive_json_answer(query)
+    LOGGER.debug("Send query: %s", query)
+    answer = livestatus_socket.send_query_and_receive_json_answer(query, auth=auth)
+    LOGGER.debug("Answer from livestatus: %s", answer)
     formatted_answer = format_answer(query, answer, key)
 
     return json.dumps(formatted_answer, sort_keys=False, indent=4)
 
 
-def perform_command(command, socket_path, key=None):
+def perform_command(command, socket_path, key=None, auth=None):
     livestatus_socket = LivestatusSocket(socket_path)
     livestatus_socket.send_command(command)
     return "OK"
