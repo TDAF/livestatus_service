@@ -25,7 +25,7 @@ THE SOFTWARE.
 from mock import patch, Mock
 import unittest
 
-from livestatus_service.dispatcher import perform_command, perform_query
+from livestatus_service.dispatcher import perform_command, perform_query, check_contact_permissions, check_auth_contactgroup_cmds
 
 
 class DispatcherTests(unittest.TestCase):
@@ -76,3 +76,61 @@ class DispatcherTests(unittest.TestCase):
         perform_query('FOO;bar', key=None, handler='livestatus', auth='admin')
 
         query.assert_called_with('FOO;bar', '/path/to/socket', None, auth='admin')
+
+    @patch('livestatus_service.dispatcher.get_current_configuration')
+    @patch('livestatus_service.dispatcher.perform_livestatus_query')
+    def test_perform_query_should_dispatch_to_livestatus_if_handler_is_livestatus_admin_default_is_none(self, query, current_config):
+        mock_config = Mock()
+        mock_config.livestatus_socket = '/path/to/socket'
+        current_config.return_value = mock_config
+
+        perform_query('FOO;bar', key=None, handler='livestatus')
+
+        query.assert_called_with('FOO;bar', '/path/to/socket', None, auth=None)
+
+    @patch('livestatus_service.dispatcher.check_auth_contactgroup_cmds')
+    def test_check_contact_permissions_should_call_cmd_group_check_function(self, check_func):
+        check_contact_permissions("DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS;contactgroup", "admin")
+        check_func.assert_called_with("admin", "contactgroup")
+
+    @patch('livestatus_service.dispatcher.check_auth_contactgroup_cmds')
+    def test_check_contact_permissions_should_call_cmd_group_check_function(self, check_func):
+        self.assertRaises(NameError, check_contact_permissions, "NO_EXISTANT_COMMAND;contactgroup", "admin")
+
+    @patch('livestatus_service.dispatcher.perform_query')
+    def test_check_auth_func_return_false_if_empty_response(self, query):
+        query.return_value = "[]"
+
+        self.assertFalse(check_auth_contactgroup_cmds("admin","param"))
+
+    @patch('livestatus_service.dispatcher.perform_query')
+    def test_check_auth_func_return_true_if_non_empty_response(self, query):
+        query.return_value = '["something"]'
+
+        self.assertTrue(check_auth_contactgroup_cmds("admin","param"))
+
+    @patch('livestatus_service.dispatcher.check_contact_permissions')
+    @patch('livestatus_service.dispatcher.get_current_configuration')
+    @patch('livestatus_service.dispatcher.perform_livestatus_command')
+    def test_perform_command_should_call_check_contact_permissions_if_not_admin(self, cmd, current_config, perm):
+        mock_config = Mock()
+        mock_config.livestatus_socket = '/path/to/socket'
+        mock_config.admins = ["admin"]
+        current_config.return_value = mock_config
+
+        perform_command('FOO;bar', None, handler='livestatus', auth="ftp")
+
+        perm.assert_called_with('FOO;bar', 'ftp')
+
+    @patch('livestatus_service.dispatcher.check_contact_permissions')
+    @patch('livestatus_service.dispatcher.get_current_configuration')
+    @patch('livestatus_service.dispatcher.perform_livestatus_command')
+    def test_perform_command_should_call_check_contact_permissions_if_not_admin(self, cmd, current_config, perm):
+        mock_config = Mock()
+        mock_config.livestatus_socket = '/path/to/socket'
+        mock_config.admins = ["admin"]
+        current_config.return_value = mock_config
+
+        perform_command('FOO;bar', None, handler='livestatus', auth="admin")
+
+        self.assertFalse(perm.called)

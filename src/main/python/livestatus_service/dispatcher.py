@@ -47,8 +47,9 @@ def perform_query(query, key=None, auth=None, handler=None):
 
 def check_contact_permissions(command, auth):
     cmd_group,param = get_command_group_and_arg(command)
+    LOGGER.debug("cmd_group: %s, param: %s", cmd_group, param)
 
-    LOGGER.debug("Checking if contact {0} has permissions to execute {1}".format(auth,command)) 
+    LOGGER.debug("Checking if contact {0} has permissions to execute {1}".format(auth,command))
 
     check_function_name = "check_auth_%s" % cmd_group.lower()
     if not eval(check_function_name)(auth, param):
