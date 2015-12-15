@@ -35,22 +35,24 @@ class DispatcherTests(unittest.TestCase):
     def test_perform_command_should_dispatch_to_livestatus_if_handler_is_livestatus(self, cmd, current_config):
         mock_config = Mock()
         mock_config.livestatus_socket = '/path/to/socket'
+        mock_config.admins = ["admin"]
         current_config.return_value = mock_config
 
-        perform_command('FOO;bar', None, 'livestatus')
+        perform_command('FOO;bar', None, handler='livestatus', auth="admin")
 
-        cmd.assert_called_with('FOO;bar', '/path/to/socket', None)
+        cmd.assert_called_with('FOO;bar', '/path/to/socket', None, auth='admin')
 
     @patch('livestatus_service.dispatcher.get_current_configuration')
     @patch('livestatus_service.dispatcher.perform_icinga_command')
     def test_perform_command_should_dispatch_to_icinga_if_handler_is_icinga(self, cmd, current_config):
         mock_config = Mock()
         mock_config.icinga_command_file = '/path/to/commandfile.cmd'
+        mock_config.admins = ["admin"]
         current_config.return_value = mock_config
 
-        perform_command('FOO;bar', None, 'icinga')
+        perform_command('FOO;bar', key=None, handler='icinga', auth="admin")
 
-        cmd.assert_called_with('FOO;bar', '/path/to/commandfile.cmd', None)
+        cmd.assert_called_with('FOO;bar', '/path/to/commandfile.cmd', None, auth='admin')
 
     @patch('livestatus_service.dispatcher.get_current_configuration')
     def test_perform_command_should_raise_exception_when_handler_does_not_exist(self, current_config):
@@ -71,6 +73,6 @@ class DispatcherTests(unittest.TestCase):
         mock_config.livestatus_socket = '/path/to/socket'
         current_config.return_value = mock_config
 
-        perform_query('FOO;bar', None, 'livestatus')
+        perform_query('FOO;bar', key=None, handler='livestatus', auth='admin')
 
-        query.assert_called_with('FOO;bar', '/path/to/socket', None)
+        query.assert_called_with('FOO;bar', '/path/to/socket', None, auth='admin')
