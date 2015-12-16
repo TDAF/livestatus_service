@@ -71,22 +71,37 @@ class DispatcherTests(unittest.TestCase):
     def test_perform_query_should_dispatch_to_livestatus_if_handler_is_livestatus(self, query, current_config):
         mock_config = Mock()
         mock_config.livestatus_socket = '/path/to/socket'
+        mock_config.admins = []
         current_config.return_value = mock_config
 
-        perform_query('FOO;bar', key=None, handler='livestatus', auth='admin')
+        perform_query('FOO;bar', key=None, handler='livestatus', auth='user')
 
-        query.assert_called_with('FOO;bar', '/path/to/socket', None, auth='admin')
+        query.assert_called_with('FOO;bar', '/path/to/socket', None, auth='user')
 
     @patch('livestatus_service.dispatcher.get_current_configuration')
     @patch('livestatus_service.dispatcher.perform_livestatus_query')
     def test_perform_query_should_dispatch_to_livestatus_if_handler_is_livestatus_admin_default_is_none(self, query, current_config):
         mock_config = Mock()
         mock_config.livestatus_socket = '/path/to/socket'
+        mock_config.admins = []
         current_config.return_value = mock_config
 
         perform_query('FOO;bar', key=None, handler='livestatus')
 
         query.assert_called_with('FOO;bar', '/path/to/socket', None, auth=None)
+
+    @patch('livestatus_service.dispatcher.get_current_configuration')
+    @patch('livestatus_service.dispatcher.perform_livestatus_query')
+    def test_perform_query_should_dispatch_to_livestatus_with_auth_none_if_admin_user(self, query, current_config):
+        mock_config = Mock()
+        mock_config.livestatus_socket = '/path/to/socket'
+        mock_config.admins = ["admin"]
+        current_config.return_value = mock_config
+
+        perform_query('FOO;bar', key=None, handler='livestatus', auth="admin")
+
+        query.assert_called_with('FOO;bar', '/path/to/socket', None, auth=None)
+
 
     @patch('livestatus_service.dispatcher.check_auth_contactgroup_cmds')
     def test_check_contact_permissions_should_call_cmd_group_check_function(self, check_func):
