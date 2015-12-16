@@ -39,6 +39,11 @@ LOGGER = logging.getLogger('livestatus.livestatus')
 
 def perform_query(query, key=None, auth=None, handler=None):
     configuration = get_current_configuration()
+
+    # Admins could query everything
+    if auth in configuration.admins:
+        auth = None
+
     if _is_livestatus_handler(handler):
         socket_path = configuration.livestatus_socket
         return perform_livestatus_query(query, socket_path, key, auth=auth)
