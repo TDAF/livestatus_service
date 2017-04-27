@@ -18,10 +18,11 @@ GLOBAL_CMDS = ["CHANGE_GLOBAL_HOST_EVENT_HANDLER", "CHANGE_GLOBAL_SVC_EVENT_HAND
 
 COMMAND_GROUPS = ["CONTACTGROUP_CMDS", "CONTACTNAME_CMDS", "HOSTGROUPNAME_CMDS", "SERVICEGROUPNAME_CMDS", "HOSTNAME_CMDS", "COMMENTID_CMDS", "DOWNTIMEID_CMDS", "DISABLED_CMDS", "GLOBAL_CMDS"]
 
+
 def get_command_group_and_arg(command):
     cmd_list = command.split(';')
     cmd = cmd_list[0]
     arg = cmd_list[1] if len(cmd_list) > 1 else None
     group = "".join(map(lambda k: k if cmd in eval(k) else '', COMMAND_GROUPS))
 
-    return group,arg
+    return group, arg
