@@ -85,7 +85,7 @@ def check_auth_servicegroupname_cmds(auth, param):
     return len(servicegroups) > 0
 
 def check_auth_hostname_cmds(auth, param):
-    hosts = eval(perform_query("GET hosts\nColumns: display_name\nFilter: display_name = %s" % param, auth=auth))
+    hosts = eval(perform_query("GET hosts\nColumns: host_name\nFilter: host_name = %s" % param, auth=auth))
     LOGGER.debug("check_auth_hostname_cmds, query result: %s", hosts)
     return len(hosts) > 0
 
