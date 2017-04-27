@@ -102,27 +102,26 @@ class DispatcherTests(unittest.TestCase):
 
         query.assert_called_with('FOO;bar', '/path/to/socket', None, auth=None)
 
-
     @patch('livestatus_service.dispatcher.check_auth_contactgroup_cmds')
     def test_check_contact_permissions_should_call_cmd_group_check_function(self, check_func):
         check_contact_permissions("DISABLE_CONTACTGROUP_HOST_NOTIFICATIONS;contactgroup", "admin")
         check_func.assert_called_with("admin", "contactgroup")
 
     @patch('livestatus_service.dispatcher.check_auth_contactgroup_cmds')
-    def test_check_contact_permissions_should_call_cmd_group_check_function(self, check_func):
+    def test_check_contact_permissions_no_existant_command_should_raise_exception(self, check_func):
         self.assertRaises(NameError, check_contact_permissions, "NO_EXISTANT_COMMAND;contactgroup", "admin")
 
     @patch('livestatus_service.dispatcher.perform_query')
     def test_check_auth_func_return_false_if_empty_response(self, query):
         query.return_value = "[]"
 
-        self.assertFalse(check_auth_contactgroup_cmds("admin","param"))
+        self.assertFalse(check_auth_contactgroup_cmds("admin", "param"))
 
     @patch('livestatus_service.dispatcher.perform_query')
     def test_check_auth_func_return_true_if_non_empty_response(self, query):
         query.return_value = '["something"]'
 
-        self.assertTrue(check_auth_contactgroup_cmds("admin","param"))
+        self.assertTrue(check_auth_contactgroup_cmds("admin", "param"))
 
     @patch('livestatus_service.dispatcher.check_contact_permissions')
     @patch('livestatus_service.dispatcher.get_current_configuration')
@@ -140,7 +139,7 @@ class DispatcherTests(unittest.TestCase):
     @patch('livestatus_service.dispatcher.check_contact_permissions')
     @patch('livestatus_service.dispatcher.get_current_configuration')
     @patch('livestatus_service.dispatcher.perform_livestatus_command')
-    def test_perform_command_should_call_check_contact_permissions_if_not_admin(self, cmd, current_config, perm):
+    def test_perform_command_should_call_check_contact_permissions_if_admin(self, cmd, current_config, perm):
         mock_config = Mock()
         mock_config.livestatus_socket = '/path/to/socket'
         mock_config.admins = ["admin"]

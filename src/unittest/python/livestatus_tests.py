@@ -78,7 +78,7 @@ class LivestatusTests(unittest.TestCase):
         perform_query('test', '/path/to/socket', auth="admin")
 
         mock_socket.return_value.send.assert_called_with(
-           b'test\nOutputFormat: json\nAuthUser: admin\n')
+            b'test\nOutputFormat: json\nAuthUser: admin\n')
 
     @patch('livestatus_service.livestatus.format_answer')
     @patch('livestatus_service.livestatus.socket.socket')

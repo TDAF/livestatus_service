@@ -72,10 +72,6 @@ class Configuration(object):
         return self._get_option(Configuration.OPTION_ICINGA_COMMAND_FILE, Configuration.DEFAULT_ICINGA_COMMAND_FILE)
 
     @property
-    def icinga_command_file(self):
-        return self._get_option(Configuration.OPTION_ICINGA_COMMAND_FILE, Configuration.DEFAULT_ICINGA_COMMAND_FILE)
-
-    @property
     def admins(self):
         admins_csv = self._get_option(Configuration.OPTION_ADMINS, Configuration.DEFAULT_ADMINS)
         return admins_csv.split(',')

@@ -20,7 +20,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 '''
 
-from mock import patch, Mock
 import unittest
 
 from livestatus_service.external_commands import get_command_group_and_arg
@@ -29,25 +28,25 @@ from livestatus_service.external_commands import get_command_group_and_arg
 class ExternalCommandsTests(unittest.TestCase):
 
     def test_get_command_group_and_arg_for_global_command(self):
-        group,arg = get_command_group_and_arg("CHANGE_GLOBAL_HOST_EVENT_HANDLER")
+        group, arg = get_command_group_and_arg("CHANGE_GLOBAL_HOST_EVENT_HANDLER")
         self.assertEqual(group, "GLOBAL_CMDS")
 
     def test_get_command_group_and_arg_for_disabled_commands(self):
-        group,arg = get_command_group_and_arg("DEL_DOWNTIME_BY_START_TIME_COMMENT")
+        group, arg = get_command_group_and_arg("DEL_DOWNTIME_BY_START_TIME_COMMENT")
         self.assertEqual(group, "DISABLED_CMDS")
 
     def test_get_command_group_and_arg_for_hostname_commands_with_host(self):
         hostname = "HOST"
-        group,arg = get_command_group_and_arg("ACKNOWLEDGE_HOST_PROBLEM;%s" % hostname)
+        group, arg = get_command_group_and_arg("ACKNOWLEDGE_HOST_PROBLEM;%s" % hostname)
         self.assertEqual(group, "HOSTNAME_CMDS")
         self.assertEqual(arg, hostname)
 
     def test_get_command_group_and_arg_for_servicegroup_commands_without_host(self):
-        group,arg = get_command_group_and_arg("DISABLE_SERVICEGROUP_HOST_CHECKS")
+        group, arg = get_command_group_and_arg("DISABLE_SERVICEGROUP_HOST_CHECKS")
         self.assertEqual(group, "SERVICEGROUPNAME_CMDS")
         self.assertEqual(arg, None)
 
     def test_get_command_group_and_arg_for_servicegroup_commands_with_semicolon(self):
-        group,arg = get_command_group_and_arg("DISABLE_SERVICEGROUP_HOST_CHECKS;")
+        group, arg = get_command_group_and_arg("DISABLE_SERVICEGROUP_HOST_CHECKS;")
         self.assertEqual(group, "SERVICEGROUPNAME_CMDS")
         self.assertEqual(arg, '')
